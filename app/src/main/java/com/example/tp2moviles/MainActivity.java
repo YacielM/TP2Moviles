@@ -1,5 +1,6 @@
 package com.example.tp2moviles;
 
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,16 +10,28 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
+    private DesbloqueoReceiver desbloqueoReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        desbloqueoReceiver = new DesbloqueoReceiver();
+        IntentFilter filter = new IntentFilter(android.content.Intent.ACTION_USER_PRESENT);
+        registerReceiver(desbloqueoReceiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (desbloqueoReceiver != null) {
+            unregisterReceiver(desbloqueoReceiver);
+            desbloqueoReceiver = null;
+        }
     }
 }
